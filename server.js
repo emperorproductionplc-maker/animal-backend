@@ -1,49 +1,52 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
+const mongoose = require('mongoose');
 const cors = require('cors');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static('.')); // Added this so you can view your HTML files
 
-// Setup Email Transporter
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS // Use an "App Password" here
-    }
+// --- DATABASE CONNECTION ---
+// Now correctly pulling from your .env file
+const mongoURI = process.env.MONGO_URI;
+
+mongoose.connect(mongoURI)
+  .then(() => console.log('✅ Connected to MongoDB successfully!'))
+  .catch(err => console.error('❌ MongoDB Connection Error:', err));
+
+const petSchema = new mongoose.Schema({
+  name: String,
+  location: String,
+  image: String
+});
+const Pet = mongoose.model('Pet', petSchema);
+
+// --- API ROUTES ---
+app.get('/api/pets', async (req, res) => {
+  try {
+    const pets = await Pet.find();
+    res.json(pets);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch pets" });
+  }
 });
 
-// 1. Notification for Website Visit
-app.get('/visit', (req, res) => {
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_USER,
-        subject: 'New Website Visit!',
-        text: 'Someone just opened your Animal Adoption website.'
-    };
-    transporter.sendMail(mailOptions);
-    res.send('Visit logged');
+app.post('/api/pets', async (req, res) => {
+  try {
+    const newPet = new Pet(req.body);
+    await newPet.save();
+    res.status(201).json(newPet);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 });
 
-// 2. Handle Messages/Adoptions/Donations
-app.post('/send-message', (req, res) => {
-    const { type, name, message, email } = req.body;
-
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_USER,
-        subject: `New ${type} Notification`,
-        text: `From: ${name} (${email})\nMessage: ${message}`
-    };
-
-    transporter.sendMail(mailOptions, (error) => {
-        if (error) return res.status(500).send(error.toString());
-        res.status(200).send('Message Sent!');
-    });
+// --- SERVER START ---
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Backend running on port ${PORT}`);
+  console.log(`🌍 Website available at http://localhost:${PORT}`);
 });
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

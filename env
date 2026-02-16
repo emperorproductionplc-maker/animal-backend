@@ -1,0 +1,3 @@
+EMAIL_USER=emperorproductionplc@gmail.com
+EMAIL_PASS=your_email_password
+MONGO_URI=mongodb+srv://emperorproductionplc:O0fTewx1aEAlixyR@cluster0.v2qxrcf.mongodb.net/PawsOfHope?retryWrites=true&w=majority
