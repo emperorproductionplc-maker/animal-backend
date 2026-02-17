@@ -8,6 +8,7 @@
     .card { max-width: 400px; background: white; padding: 30px; border-radius: 15px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
     button { background: #e67e22; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    button:hover { background: #d35400; }
   </style>
 </head>
 <body>
@@ -19,24 +20,48 @@
       <input type="text" id="img" placeholder="Image Link (URL)" required>
       <button type="submit">Upload Pet</button>
     </form>
-    <p style="text-align:center;"><a href="index.html">View Website</a></p>
+    <p style="text-align:center;"><a href="index.html">Back to Home</a></p>
   </div>
+
   <script>
     document.getElementById('petForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+
+      // 1. Ask for the secret password you set in Render
+      const adminPass = prompt("Enter Admin Password:");
+      
+      if (!adminPass) {
+        alert("Password is required to upload!");
+        return;
+      }
+
       const pet = {
         name: document.getElementById('name').value,
         location: document.getElementById('loc').value,
         image: document.getElementById('img').value
       };
+
       try {
-        const res = await fetch('http://localhost:5000/api/pets', {
+        // 2. Updated URL to '/api/pets' so it works on Render live site
+        const res = await fetch('/api/pets', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'admin-password': adminPass // Sending password to backend
+          },
           body: JSON.stringify(pet)
         });
-        if(res.ok) { alert("Pet Added!"); window.location.href="index.html"; }
-      } catch (err) { alert("Is your backend running?"); }
+
+        if(res.ok) { 
+          alert("✅ Pet Added Successfully!"); 
+          window.location.href="index.html"; 
+        } else {
+          const errorData = await res.json();
+          alert("❌ Access Denied: " + (errorData.message || "Incorrect Password"));
+        }
+      } catch (err) { 
+        alert("Connection Error. Check if your Render server is awake."); 
+      }
     });
   </script>
 </body>
