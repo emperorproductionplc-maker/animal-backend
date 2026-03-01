@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RXRFNL2RP5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-RXRFNL2RP5');
+  </script>
+
+  <meta charset="UTF-8">
+  <title>Admin - PawsOfHope</title>
+  <style>
+    body { font-family: sans-serif; background: #f4f7f6; padding: 40px; }
+    .card { max-width: 500px; background: white; padding: 30px; border-radius: 15px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+    button { background: #e67e22; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #d35400; }
+    .analytics-box { margin-top: 25px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; }
+    .analytics-link { display: inline-block; background: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-size: 0.9em; margin-top: 10px; }
+    .analytics-link:hover { background: #2980b9; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Add a Pet</h2>
+    <form id="petForm">
+      <input type="text" id="name" placeholder="Pet Name" required>
+      <input type="text" id="loc" placeholder="Location" required>
+      <input type="text" id="img" placeholder="Image Link (URL)" required>
+      <button type="submit">Upload Pet</button>
+    </form>
+
+    <div class="analytics-box">
+      <h3>Website Traffic Details</h3>
+      <p style="font-size: 0.9em; color: #666;">View real-time visitor locations, devices, and total views.</p>
+      <a href="https://analytics.google.com/analytics/web/" target="_blank" class="analytics-link">Open Full Visitor Reports</a>
+    </div>
+
+    <p style="text-align:center; margin-top: 20px;"><a href="index.html">Back to Home</a></p>
+  </div>
+
+  <script>
+    document.getElementById('petForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const adminPass = prompt("Enter Admin Password:");
+      
+      if (!adminPass) {
+        alert("Action cancelled. Password is required.");
+        return;
+      }
+
+      const pet = {
+        name: document.getElementById('name').value,
+        location: document.getElementById('loc').value,
+        image: document.getElementById('img').value
+      };
+
+      try {
+        const res = await fetch('/api/pets', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'admin-password': adminPass 
+          },
+          body: JSON.stringify(pet)
+        });
+
+        const result = await res.json();
+        if(res.ok) { 
+          alert("✅ Success! " + (result.message || "Pet uploaded.")); 
+          window.location.href="index.html"; 
+        } else {
+          alert("❌ Access Denied: " + (result.message || "Unauthorized"));
+        }
+      } catch (err) { 
+        alert("⚠️ Connection Error: Is the Render service live?"); 
+      }
+    });
+  </script>
+</body>
+</html>
