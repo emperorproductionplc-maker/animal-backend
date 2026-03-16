@@ -1,43 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin - PawsOfHope</title>
-  <style>
-    body { font-family: sans-serif; background: #f4f7f6; padding: 40px; }
-    .card { max-width: 400px; background: white; padding: 30px; border-radius: 15px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-    button { background: #e67e22; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PawsOfHope | Master Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #e67e22; --secondary: #2c3e50; --bg: #f8f9fa; --white: #ffffff; --danger: #e74c3c; --success: #27ae60; --info: #3498db; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--secondary); }
+        
+        /* Login UI & Feedback */
+        #loginOverlay { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); position: fixed; width: 100%; z-index: 1000; }
+        .login-card { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); width: 90%; max-width: 400px; text-align: center; transition: 0.3s; }
+        
+        .shake { animation: shake 0.5s; border: 2px solid var(--danger); }
+        @keyframes shake {
+            0%, 100% {transform: translateX(0);}
+            25% {transform: translateX(-10px);}
+            75% {transform: translateX(10px);}
+        }
+
+        #loginStatus { margin-top: 15px; font-size: 0.9rem; font-weight: 600; min-height: 20px; }
+        .status-error { color: var(--danger); }
+        .status-success { color: var(--success); }
+        
+        #adminContent { display: none; padding: 20px; max-width: 1200px; margin: auto; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 2px solid #ddd; margin-bottom: 30px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
+        .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #eee; margin-bottom: 25px; }
+        .card h2 { margin-top: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; color: var(--primary); }
+        
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: #7f8c8d; }
+        input { width: 100%; padding: 12px; border: 2px solid #f1f1f1; border-radius: 12px; box-sizing: border-box; transition: 0.3s; margin-bottom: 15px; }
+        input:focus { border-color: var(--primary); outline: none; }
+        
+        .btn { background: var(--primary); color: white; border: none; padding: 14px 20px; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
+        .btn:hover { background: #d35400; transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 2px solid var(--secondary); color: var(--secondary); width: auto; }
+        .btn-danger { background: var(--danger); font-size: 0.75rem; width: auto; padding: 6px 12px; }
+
+        .table-wrapper { overflow-x: auto; margin-top: 15px; border-radius: 12px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 600px; }
+        th { background: #fdf2e9; padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: #a04000; letter-spacing: 1px; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        
+        /* Dynamic Tags */
+        .type-tag { padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; color: white; }
+        .tag-adoption { background: var(--primary); }
+        .tag-volunteer { background: var(--info); }
+        .tag-foster { background: var(--success); }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Add a Pet</h2>
-    <form id="petForm">
-      <input type="text" id="name" placeholder="Pet Name" required>
-      <input type="text" id="loc" placeholder="Location" required>
-      <input type="text" id="img" placeholder="Image Link (URL)" required>
-      <button type="submit">Upload Pet</button>
-    </form>
-    <p style="text-align:center;"><a href="index.html">View Website</a></p>
-  </div>
-  <script>
-    document.getElementById('petForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const pet = {
-        name: document.getElementById('name').value,
-        location: document.getElementById('loc').value,
-        image: document.getElementById('img').value
-      };
-      try {
-        const res = await fetch('http://localhost:5000/api/pets', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(pet)
-        });
-        if(res.ok) { alert("Pet Added!"); window.location.href="index.html"; }
-      } catch (err) { alert("Is your backend running?"); }
+
+<div id="loginOverlay">
+    <div class="login-card" id="loginBox">
+        <i class="fas fa-paw" style="font-size: 3.5rem; color: var(--primary); margin-bottom: 15px;"></i>
+        <h1 style="margin:0">Admin Portal</h1>
+        <p style="color:#7f8c8d">Secure database access</p>
+        <div style="margin-top:25px; text-align:left">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="admin@pawsofhope.com">
+            <label>Master Password</label>
+            <input type="password" id="password" placeholder="••••••••">
+            <button class="btn" id="loginBtn" onclick="login()">Enter Dashboard</button>
+        </div>
+        <div id="loginStatus"></div>
+    </div>
+</div>
+
+<div id="adminContent">
+    <header>
+        <div>
+            <h1 style="margin:0">Management Hub</h1>
+            <p style="margin:0; color:#7f8c8d; font-size:0.9rem;">Welcome back, Administrator</p>
+        </div>
+        <button class="btn btn-outline" onclick="logout()">Secure Logout</button>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <h2><i class="fas fa-images"></i> Image Sync</h2>
+            <div class="input-group">
+                <label>Luna (Urgent)</label>
+                <input type="text" id="lunaUrl" placeholder="Link...">
+                <button class="btn" onclick="updatePet('luna','lunaUrl')">Sync</button>
+            </div>
+            <div style="height:15px"></div>
+            <div class="input-group">
+                <label>Buddy (Dog)</label>
+                <input type="text" id="buddyUrl" placeholder="Link...">
+                <button class="btn" onclick="updatePet('buddy','buddyUrl')">Sync</button>
+            </div>
+            <div style="height:15px"></div>
+            <div class="input-group">
+                <label>Cleo (Cat)</label>
+                <input type="text" id="cleoUrl" placeholder="Link...">
+                <button class="btn" onclick="updatePet('cleo','cleoUrl')">Sync</button>
+            </div>
+            <div style="height:15px"></div>
+            <div class="input-group">
+                <label>Max (Dog)</label>
+                <input type="text" id="maxUrl" placeholder="Link...">
+                <button class="btn" onclick="updatePet('max','maxUrl')">Sync</button>
+            </div>
+        </div>
+
+        <div class="card" style="grid-column: span 2;">
+            <h2><i class="fas fa-envelope-open-text"></i> All Incoming Applications</h2>
+            <p style="font-size: 0.8rem; color: #777;">Real-time stream of Adoptions, Volunteers, and Fosters.</p>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Applicant</th>
+                            <th>Contact Info</th>
+                            <th>Message/Interest</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="masterApplicationList">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWxk2ON1Pvgu8_koHo_JviAa4vv9G9DQw",
+        authDomain: "pawsofhope-ea391.firebaseapp.com",
+        databaseURL: "https://pawsofhope-ea391-default-rtdb.firebaseio.com",
+        projectId: "pawsofhope-ea391",
+        storageBucket: "pawsofhope-ea391.firebasestorage.app",
+        appId: "1:484030420570:web:16b7e1a1e8ca55a0046a63"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    function login() {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+        auth.signInWithEmailAndPassword(email, pass).catch(e => alert("Invalid Login"));
+    }
+
+    function logout() { auth.signOut(); }
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'block';
+            startListening();
+        } else {
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('adminContent').style.display = 'none';
+        }
     });
-  </script>
+
+    function updatePet(pet, inputId) {
+        const url = document.getElementById(inputId).value;
+        if(url) db.ref('pets/' + pet).set(url).then(() => alert("Updated!"));
+    }
+
+    // THIS IS THE KEY PART: Unified Listener for all 3 nodes
+    function startListening() {
+        const list = document.getElementById('masterApplicationList');
+        list.innerHTML = ""; // Clear list
+
+        // Listen for Adoption Requests
+        db.ref('requests').on('value', snap => renderItems(snap.val(), 'adoption'));
+        // Listen for Volunteers
+        db.ref('volunteers').on('value', snap => renderItems(snap.val(), 'volunteer'));
+        // Listen for Foster Apps
+        db.ref('foster_apps').on('value', snap => renderItems(snap.val(), 'foster'));
+    }
+
+    function renderItems(data, category) {
+        if (!data) return;
+        const list = document.getElementById('masterApplicationList');
+        
+        // We use a specific ID for each row so we don't duplicate when updating
+        Object.keys(data).forEach(key => {
+            const r = data[key];
+            const rowId = `row-${key}`;
+            let existingRow = document.getElementById(rowId);
+            
+            const rowHTML = `
+                <td><span class="type-tag tag-${category}">${category}</span></td>
+                <td><strong>${r.name || r.userName}</strong><br><small>${r.timestamp || ''}</small></td>
+                <td>${r.email}<br><strong>${r.phone || 'N/A'}</strong></td>
+                <td><div style="max-width:200px; font-size:0.8rem;">${r.message || r.petName || 'Inquiry'}</div></td>
+                <td><button class="btn btn-danger" onclick="deleteEntry('${category}', '${key}')">Clear</button></td>
+            `;
+            if (existingRow) {
+                existingRow.innerHTML = rowHTML;
+            } else {
+                const newRow = document.createElement('tr');
+                newRow.id = rowId;
+                newRow.innerHTML = rowHTML;
+                list.prepend(newRow); // Newest at top
+            }
+        });
+    }
+
+    function deleteEntry(category, id) {
+        let node = category === 'adoption' ? 'requests' : (category === 'volunteer' ? 'volunteers' : 'foster_apps');
+        if(confirm("Mark as processed and remove?")) {
+            db.ref(node + '/' + id).remove().then(() => {
+                document.getElementById('row-' + id).remove();
+            });
+        }
+    }
+</script>
 </body>
 </html>
