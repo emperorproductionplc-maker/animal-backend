@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | PawsOfHope</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #e67e22; --secondary: #2c3e50; --bg: #fdf2e9; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .contact-card { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 90%; max-width: 500px; }
+        h2 { color: var(--secondary); margin-top: 0; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; color: #555; }
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-family: inherit; }
+        textarea { height: 120px; resize: none; }
+        input:focus, textarea:focus { border-color: var(--primary); outline: none; }
+        .btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: #d35400; }
+        #status { text-align: center; margin-top: 15px; font-size: 0.9rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="contact-card">
+    <h2><i class="fas fa-paper-plane" style="color: var(--primary);"></i> Contact Admin</h2>
+    <p style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 25px;">Have a question? Send us a message and we'll get back to you.</p>
+    
+    <form id="contactForm">
+        <label>Full Name</label>
+        <input type="text" id="contactName" placeholder="Your Name" required>
+
+        <label>Email Address</label>
+        <input type="email" id="contactEmail" placeholder="yourname@example.com" required>
+
+        <label>Subject</label>
+        <input type="text" id="contactSubject" placeholder="General Inquiry / Question" required>
+
+        <label>Message</label>
+        <textarea id="contactMessage" placeholder="How can we help you?" required></textarea>
+
+        <button type="submit" class="btn">Send Message</button>
+    </form>
+    <div id="status"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+<script>
+    // Use the same config as your Admin page
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWxk2ON1Pvgu8_koHo_JviAa4vv9G9DQw",
+        authDomain: "pawsofhope-ea391.firebaseapp.com",
+        databaseURL: "https://pawsofhope-ea391-default-rtdb.firebaseio.com",
+        projectId: "pawsofhope-ea391",
+        storageBucket: "pawsofhope-ea391.firebasestorage.app",
+        appId: "1:484030420570:web:16b7e1a1e8ca55a0046a63"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const status = document.getElementById('status');
+        const submitBtn = e.target.querySelector('button');
+        
+        // Data to send
+        const contactData = {
+            name: document.getElementById('contactName').value,
+            email: document.getElementById('contactEmail').value,
+            subject: document.getElementById('contactSubject').value,
+            message: document.getElementById('contactMessage').value,
+            timestamp: new Date().toLocaleString()
+        };
+
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Sending...";
+
+        // Push to the 'contact_messages' node
+        db.ref('contact_messages').push(contactData)
+            .then(() => {
+                status.style.color = "#27ae60";
+                status.innerText = "Message sent successfully!";
+                document.getElementById('contactForm').reset();
+            })
+            .catch((error) => {
+                status.style.color = "#e74c3c";
+                status.innerText = "Error: " + error.message;
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Send Message";
+            });
+    });
+</script>
+
+</body>
+</html>

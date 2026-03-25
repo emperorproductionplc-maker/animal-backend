@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Urgent: Save a Life | PawsOfHope</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Reusing your base styles for consistency */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #fff8f0; color: #333; margin: 0; }
+        
+        /* --- NAVIGATION --- */
+        nav { background: white; display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 2rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #333; font-weight: bold; font-size: 1.4rem; }
+        .brand-logo { background-color: #e74c3c; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        /* --- HEARTBREAKING HERO SECTION --- */
+        .story-hero {
+            padding: 4rem 2rem;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1518717758536-85ae29035b6d?q=80&w=1500&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+        }
+        .story-hero h1 { font-size: 2.8rem; margin-bottom: 1rem; color: #ff6f61; }
+        .story-container { max-width: 800px; margin: 0 auto; line-height: 1.8; font-size: 1.1rem; text-shadow: 1px 1px 5px rgba(0,0,0,0.5); }
+
+        /* --- THE CRISIS SECTION --- */
+        .crisis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1100px;
+            margin: -50px auto 4rem;
+            padding: 0 20px;
+        }
+        .crisis-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 5px solid #e74c3c;
+        }
+        .crisis-card i { font-size: 2.5rem; color: #e74c3c; margin-bottom: 1rem; }
+
+        /* --- URGENT DONATION BOX --- */
+        .urgent-donation {
+            background: #e74c3c;
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        .donation-box {
+            background: white;
+            color: #333;
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            border-radius: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        .donate-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .donate-btn:hover { background: #c0392b; transform: translateY(-3px); }
+
+        /* --- PETS AT RISK --- */
+        .at-risk-section { padding: 4rem 2rem; text-align: center; }
+        .risk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1100px; margin: 3rem auto; }
+        .risk-card { background: white; border-radius: 20px; overflow: hidden; position: relative; }
+        .risk-tag { position: absolute; top: 15px; left: 15px; background: #e74c3c; color: white; padding: 5px 12px; border-radius: 10px; font-weight: bold; font-size: 0.8rem; }
+        .risk-img { width: 100%; height: 250px; object-fit: cover; filter: grayscale(40%); }
+        
+        footer { background: #2b1e16; color: #d1cbc4; padding: 3rem 2rem; text-align: center; }
+
+        @media (max-width: 600px) {
+            .story-hero h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="brand">
+            <div class="brand-logo"><i class="fas fa-heart"></i></div>
+            PawsOfHope
+        </a>
+        <a href="contact.html" style="text-decoration:none; color:#555; font-weight:bold;">Contact Us</a>
+    </nav>
+
+    <section class="story-hero">
+        <div class="story-container">
+            <span style="background: #e74c3c; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">CRITICAL UPDATE</span>
+            <h1>A Heartbreaking Choice No One Should Make</h1>
+            <p>At PawsOfHope, our mission has always been to provide a sanctuary. But today, we are facing a devastating reality. Our halls are full, our bowls are emptying, and our medical funds are exhausted.</p>
+            <p>Due to the overwhelming cost of specialized medical care and the rising price of food, we have dogs on our "At-Risk" list—beautiful, loving souls whose time is running out simply because we can no longer afford to keep them safe.</p>
+        </div>
+    </section>
+
+    <div class="crisis-grid">
+        <div class="crisis-card">
+            <i class="fas fa-bowl-food"></i>
+            <h3>Food Shortage</h3>
+            <p>We are currently feeding 150+ pets daily. Without more aid, we cannot sustain the basic nutrition they need to survive.</p>
+        </div>
+        <div class="crisis-card">
+            <i class="fas fa-hand-holding-medical"></i>
+            <h3>Medical Debt</h3>
+            <p>Our vet bills for terminal and chronic cases have exceeded our budget. These pets are set for euthanasia to end their suffering—unless we can afford their treatment.</p>
+        </div>
+        <div class="crisis-card">
+            <i class="fas fa-clock"></i>
+            <h3>Final Notice</h3>
+            <p>For many of our older residents, this is their final week. Your donation is the literal barrier between life and the end of their story.</p>
+        </div>
+    </div>
+
+    <section class="at-risk-section">
+        <h2>Souls Waiting for a Miracle</h2>
+        <p>These pets are currently at the top of our euthanasia list due to medical costs or lack of space.</p>
+        
+        <div class="risk-grid">
+            <div class="risk-card">
+                <span class="risk-tag">URGENT: HEARTWORM</span>
+                <img src="https://images.unsplash.com/photo-1534361960057-19889db9621e?q=80&w=500" class="risk-img">
+                <div style="padding:15px; text-align:left;">
+                    <h3>Barnaby</h3>
+                    <p style="font-size:0.9rem; color:#666;">Barnaby needs $1,200 for heartworm treatment. He is a gentle soul who just wants a lap to sleep on.</p>
+                </div>
+            </div>
+            <div class="risk-card">
+                <span class="risk-tag">URGENT: SENIOR CARE</span>
+                <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=500" class="risk-img">
+                <div style="padding:15px; text-align:left;">
+                    <h3>Goldie</h3>
+                    <p style="font-size:0.9rem; color:#666;">Goldie has been with us for 3 years. Due to her age and joint health, her care costs are rising daily.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="urgent-donation">
+        <h2>Become Their Miracle Today</h2>
+        <p>100% of these donations go directly to the "Emergency Rescue Fund" to stop euthanasia schedules.</p>
+        <div class="donation-box">
+            <h3 style="margin-top:0;">Save a Life Now</h3>
+            <p style="color:#777; font-size:0.9rem;">Your $25 gift can provide 2 weeks of food for a dog at risk.</p>
+            <a href="donate.html" class="donate-btn">Donate to Save Lives</a>
+            <p style="font-size:0.8rem; margin-top:15px; color:#999;"><i class="fas fa-lock"></i> Secure Donation via PawsOfHope Foundation</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 PawsOfHope Emergency Rescue. All rights reserved.</p>
+        <p style="font-size:0.8rem; opacity:0.7;">Working tirelessly to ensure no healthy pet is ever put down.</p>
+    </footer>
+
+</body>
+</html>

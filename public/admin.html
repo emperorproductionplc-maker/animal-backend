@@ -9,20 +9,8 @@
         :root { --primary: #e67e22; --secondary: #2c3e50; --bg: #f8f9fa; --white: #ffffff; --danger: #e74c3c; --success: #27ae60; --info: #3498db; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--secondary); }
         
-        /* Login UI & Feedback */
         #loginOverlay { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); position: fixed; width: 100%; z-index: 1000; }
-        .login-card { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); width: 90%; max-width: 400px; text-align: center; transition: 0.3s; }
-        
-        .shake { animation: shake 0.5s; border: 2px solid var(--danger); }
-        @keyframes shake {
-            0%, 100% {transform: translateX(0);}
-            25% {transform: translateX(-10px);}
-            75% {transform: translateX(10px);}
-        }
-
-        #loginStatus { margin-top: 15px; font-size: 0.9rem; font-weight: 600; min-height: 20px; }
-        .status-error { color: var(--danger); }
-        .status-success { color: var(--success); }
+        .login-card { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); width: 90%; max-width: 400px; text-align: center; }
         
         #adminContent { display: none; padding: 20px; max-width: 1200px; margin: auto; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 2px solid #ddd; margin-bottom: 30px; }
@@ -45,28 +33,26 @@
         th { background: #fdf2e9; padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: #a04000; letter-spacing: 1px; }
         td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
         
-        /* Dynamic Tags */
         .type-tag { padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; color: white; }
         .tag-adoption { background: var(--primary); }
         .tag-volunteer { background: var(--info); }
         .tag-foster { background: var(--success); }
+        .tag-contact { background: #9b59b6; }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
-    <div class="login-card" id="loginBox">
+    <div class="login-card">
         <i class="fas fa-paw" style="font-size: 3.5rem; color: var(--primary); margin-bottom: 15px;"></i>
         <h1 style="margin:0">Admin Portal</h1>
-        <p style="color:#7f8c8d">Secure database access</p>
         <div style="margin-top:25px; text-align:left">
             <label>Email Address</label>
             <input type="email" id="email" placeholder="admin@pawsofhope.com">
             <label>Master Password</label>
             <input type="password" id="password" placeholder="••••••••">
-            <button class="btn" id="loginBtn" onclick="login()">Enter Dashboard</button>
+            <button class="btn" onclick="login()">Enter Dashboard</button>
         </div>
-        <div id="loginStatus"></div>
     </div>
 </div>
 
@@ -109,7 +95,7 @@
 
         <div class="card" style="grid-column: span 2;">
             <h2><i class="fas fa-envelope-open-text"></i> All Incoming Applications</h2>
-            <p style="font-size: 0.8rem; color: #777;">Real-time stream of Adoptions, Volunteers, and Fosters.</p>
+            <p style="font-size: 0.8rem; color: #777;">Real-time stream of Adoptions, Volunteers, Fosters, and Messages.</p>
             <div class="table-wrapper">
                 <table>
                     <thead>
@@ -117,12 +103,11 @@
                             <th>Type</th>
                             <th>Applicant</th>
                             <th>Contact Info</th>
-                            <th>Message/Interest</th>
+                            <th>Details</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="masterApplicationList">
-                        </tbody>
+                    <tbody id="masterApplicationList"></tbody>
                 </table>
             </div>
         </div>
@@ -167,27 +152,27 @@
 
     function updatePet(pet, inputId) {
         const url = document.getElementById(inputId).value;
-        if(url) db.ref('pets/' + pet).set(url).then(() => alert("Updated!"));
+        if(url) db.ref('pets/' + pet).set(url).then(() => alert("Image Updated!"));
     }
 
-    // THIS IS THE KEY PART: Unified Listener for all 3 nodes
     function startListening() {
         const list = document.getElementById('masterApplicationList');
-        list.innerHTML = ""; // Clear list
+        list.innerHTML = ""; 
 
         // Listen for Adoption Requests
         db.ref('requests').on('value', snap => renderItems(snap.val(), 'adoption'));
-        // Listen for Volunteers
-        db.ref('volunteers').on('value', snap => renderItems(snap.val(), 'volunteer'));
-        // Listen for Foster Apps
-        db.ref('foster_apps').on('value', snap => renderItems(snap.val(), 'foster'));
+        // Listen for Volunteers (Matches Rules: volunteerApplications)
+        db.ref('volunteerApplications').on('value', snap => renderItems(snap.val(), 'volunteer'));
+        // Listen for Foster Apps (Matches Rules: fosterApplications)
+        db.ref('fosterApplications').on('value', snap => renderItems(snap.val(), 'foster'));
+        // Listen for Contact Messages
+        db.ref('contact_messages').on('value', snap => renderItems(snap.val(), 'contact'));
     }
 
     function renderItems(data, category) {
         if (!data) return;
         const list = document.getElementById('masterApplicationList');
         
-        // We use a specific ID for each row so we don't duplicate when updating
         Object.keys(data).forEach(key => {
             const r = data[key];
             const rowId = `row-${key}`;
@@ -195,9 +180,12 @@
             
             const rowHTML = `
                 <td><span class="type-tag tag-${category}">${category}</span></td>
-                <td><strong>${r.name || r.userName}</strong><br><small>${r.timestamp || ''}</small></td>
-                <td>${r.email}<br><strong>${r.phone || 'N/A'}</strong></td>
-                <td><div style="max-width:200px; font-size:0.8rem;">${r.message || r.petName || 'Inquiry'}</div></td>
+                <td><strong>${r.name || r.userName || 'Unknown'}</strong><br><small>${r.timestamp || ''}</small></td>
+                <td>${r.email}<br><strong>${r.phone || ''}</strong></td>
+                <td><div style="max-width:220px; font-size:0.8rem;">
+                    ${r.subject ? '<b>'+r.subject+'</b>: ' : ''}
+                    ${r.message || r.petName || 'Inquiry'}
+                </div></td>
                 <td><button class="btn btn-danger" onclick="deleteEntry('${category}', '${key}')">Clear</button></td>
             `;
             if (existingRow) {
@@ -206,16 +194,24 @@
                 const newRow = document.createElement('tr');
                 newRow.id = rowId;
                 newRow.innerHTML = rowHTML;
-                list.prepend(newRow); // Newest at top
+                list.prepend(newRow); 
             }
         });
     }
 
     function deleteEntry(category, id) {
-        let node = category === 'adoption' ? 'requests' : (category === 'volunteer' ? 'volunteers' : 'foster_apps');
+        let nodeMap = {
+            'adoption': 'requests',
+            'volunteer': 'volunteerApplications',
+            'foster': 'fosterApplications',
+            'contact': 'contact_messages'
+        };
+        let node = nodeMap[category];
+
         if(confirm("Mark as processed and remove?")) {
             db.ref(node + '/' + id).remove().then(() => {
-                document.getElementById('row-' + id).remove();
+                const el = document.getElementById('row-' + id);
+                if(el) el.remove();
             });
         }
     }
